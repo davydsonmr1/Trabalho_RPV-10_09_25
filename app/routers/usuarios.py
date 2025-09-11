@@ -71,7 +71,7 @@ def listar_usuarios(usuario: dict = Depends(get_usuario_atual)):
         })
     return lista_usuarios
 
-    @router.put("/atualizarUsuario/{user_id}")
+@router.put("/atualizarUsuario/{user_id}")
 def atualizar_usuario(user_id: str, usuario_update: UsuarioUpdate, usuario_logado: dict = Depends(get_usuario_atual)):
     hash_senha = gerar_hash(usuario_update.password)
     dados_cep = buscar_cep(usuario_update.cep)
