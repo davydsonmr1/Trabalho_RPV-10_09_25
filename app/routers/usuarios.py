@@ -92,5 +92,12 @@ def atualizar_usuario(user_id: str, usuario_update: UsuarioUpdate, usuario_logad
 
     return {"mensagem": "Usuário atualizado com sucesso!"}
 
-
+@router.delete("/deletarUsuario/{user_id}")
+def deletar_usuario(user_id: str, usuario_logado: dict = Depends(get_usuario_atual)):
+    if str(usuario_logado["_id"]) == user_id:
+        raise HTTPException(status_code=403, detail="Não é permitido deletar o próprio usuário.")
+    
+    usuarios.delete_one({"_id": ObjectId(user_id)})
+    
+    return {"mensagem": "Usuário deletado com sucesso!"}
 
