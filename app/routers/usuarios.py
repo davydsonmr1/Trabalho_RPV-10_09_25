@@ -71,3 +71,26 @@ def listar_usuarios(usuario: dict = Depends(get_usuario_atual)):
         })
     return lista_usuarios
 
+    @router.put("/atualizarUsuario/{user_id}")
+def atualizar_usuario(user_id: str, usuario_update: UsuarioUpdate, usuario_logado: dict = Depends(get_usuario_atual)):
+    hash_senha = gerar_hash(usuario_update.password)
+    dados_cep = buscar_cep(usuario_update.cep)
+
+    usuarios.update_one(
+        {"_id": ObjectId(user_id)},
+        {"$set": {
+            "password": hash_senha,
+            "cep": usuario_update.cep,
+            "numero": usuario_update.numero,
+            "complemento": usuario_update.complemento,
+            "logradouro": dados_cep["logradouro"],
+            "bairro": dados_cep["bairro"],
+            "localidade": dados_cep["localidade"],
+            "uf": dados_cep["uf"]
+        }}
+    )
+
+    return {"mensagem": "Usuário atualizado com sucesso!"}
+
+
+
