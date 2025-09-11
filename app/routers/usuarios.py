@@ -1,11 +1,12 @@
 # app/routers/usuarios.py
 from fastapi import APIRouter, Depends, HTTPException
-from ..models import UsuarioLogin, UsuarioCadastro
+from ..models import UsuarioLogin, UsuarioCadastro, UsuarioUpdate
 from ..auth import get_usuario, gerar_hash, autenticar_usuario, criar_token, get_usuario_atual
 from ..database import usuarios
 from ..config import ACCESS_TOKEN_EXPIRE_MINUTES
 from datetime import timedelta
 from ..viacep import buscar_cep
+from bson import ObjectId
 
 
 router = APIRouter(prefix="/usuarios", tags=["Usuários"])
@@ -52,3 +53,21 @@ def logar(usuario: UsuarioLogin):
     )
 
     return {"token": access_token, "expires": timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)} 
+
+@router.get("/listarUsuario")
+def listar_usuarios(usuario: dict = Depends(get_usuario_atual)):
+    lista_usuarios = []
+    for usuario in usuarios.find():
+        lista_usuarios.append({
+            "id": str(usuario["_id"]),
+            "username": usuario["username"],
+            "cep": usuario["cep"],
+            "numero": usuario["numero"],
+            "complemento": usuario["complemento"],
+            "logradouro": usuario["logradouro"],
+            "bairro": usuario["bairro"],
+            "localidade": usuario["localidade"],
+            "uf": usuario["uf"]
+        })
+    return lista_usuarios
+
