@@ -54,7 +54,7 @@ def logar(usuario: UsuarioLogin):
 
     return {"token": access_token, "expires": timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)} 
 
-@router.get("/listarUsuario")
+@router.get("/")
 def listar_usuarios(usuario: dict = Depends(get_usuario_atual)):
     lista_usuarios = []
     for usuario in usuarios.find():
@@ -71,7 +71,7 @@ def listar_usuarios(usuario: dict = Depends(get_usuario_atual)):
         })
     return lista_usuarios
 
-@router.put("/atualizarUsuario/{user_id}")
+@router.put("/{user_id}")
 def atualizar_usuario(user_id: str, usuario_update: UsuarioUpdate, usuario_logado: dict = Depends(get_usuario_atual)):
     hash_senha = gerar_hash(usuario_update.password)
     dados_cep = buscar_cep(usuario_update.cep)
@@ -92,7 +92,7 @@ def atualizar_usuario(user_id: str, usuario_update: UsuarioUpdate, usuario_logad
 
     return {"mensagem": "Usuário atualizado com sucesso!"}
 
-@router.delete("/deletarUsuario/{user_id}")
+@router.delete("/{user_id}")
 def deletar_usuario(user_id: str, usuario_logado: dict = Depends(get_usuario_atual)):
     if str(usuario_logado["_id"]) == user_id:
         raise HTTPException(status_code=403, detail="Não é permitido deletar o próprio usuário.")
@@ -100,4 +100,3 @@ def deletar_usuario(user_id: str, usuario_logado: dict = Depends(get_usuario_atu
     usuarios.delete_one({"_id": ObjectId(user_id)})
     
     return {"mensagem": "Usuário deletado com sucesso!"}
-
